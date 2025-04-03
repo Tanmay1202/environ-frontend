@@ -147,7 +147,12 @@ const WasteClassifier = () => {
         'plastic bottle': { isRecyclable: true, material: 'Plastic', instructions: 'Remove cap and label, rinse thoroughly, then place in blue recycling bin.', tip: 'Use a reusable water bottle to reduce plastic waste.' },
         'bottle': { isRecyclable: true, material: 'Plastic', instructions: 'Remove cap and label, rinse thoroughly, then place in blue recycling bin.', tip: 'Use a reusable water bottle to reduce plastic waste.' },
         'can': { isRecyclable: true, material: 'Aluminum', instructions: 'Rinse to remove any residue, then place in blue recycling bin.', tip: 'Opt for bulk purchases to reduce packaging waste.' },
-        'paper': { isRecyclable: true, material: 'Paper', instructions: 'Ensure it\'s clean and free of food residue, then place in blue recycling bin.', tip: 'Switch to digital documents to reduce paper usage.' },
+        'paper': { 
+          isRecyclable: true, 
+          material: 'Paper', 
+          instructions: `Ensure it's clean and free of food residue, then place in blue recycling bin.`, 
+          tip: 'Switch to digital documents to reduce paper usage.' 
+        },
         'food': { isRecyclable: false, material: 'Organic Waste', instructions: 'Dispose in green compost bin if available, or in black landfill bin.', tip: 'Compost food scraps to reduce landfill waste.' },
         'wrapper': { isRecyclable: false, material: 'Plastic Film', instructions: 'Dispose in black landfill bin. Plastic films are not recyclable in most curbside programs.', tip: 'Use reusable containers to avoid plastic wrappers.' },
         'plastic': { isRecyclable: true, material: 'Plastic', instructions: 'Rinse and place in blue recycling bin if accepted locally.', tip: 'Reduce plastic use by choosing reusable alternatives.' },
