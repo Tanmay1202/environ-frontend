@@ -13,6 +13,16 @@ import Introduction from './components/Introduction';
 import LocationInput from './components/LocationInput';
 import { supabase, withRetry } from './supabase';
 
+// Loading Spinner Component
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex flex-col items-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <p className="mt-4 text-gray-600">Loading...</p>
+    </div>
+  </div>
+);
+
 function App() {
   const [user, setUser] = useState(null);
   const [onboardingCompleted, setOnboardingCompleted] = useState(null);
@@ -156,7 +166,7 @@ function App() {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   return (
