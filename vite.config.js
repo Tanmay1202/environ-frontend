@@ -4,7 +4,12 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   css: {
-    postcss: './postcss.config.js'
+    postcss: {
+      plugins: {
+        tailwindcss: {},
+        autoprefixer: {},
+      },
+    },
   },
   build: {
     outDir: 'dist',
@@ -25,6 +30,10 @@ export default defineConfig({
         },
       },
     },
+    cssCodeSplit: false,
+  },
+  define: {
+    'process.env.NODE_ENV': '"production"',
   },
   server: {
     host: '0.0.0.0',
