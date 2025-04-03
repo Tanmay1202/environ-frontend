@@ -7,7 +7,10 @@ export default defineConfig({
   plugins: [react()],
   css: {
     postcss: {
-      plugins: [tailwindcss(), autoprefixer()],
+      plugins: [
+        tailwindcss(),
+        autoprefixer(),
+      ],
     },
     modules: {
       localsConvention: 'camelCase',
@@ -37,7 +40,7 @@ export default defineConfig({
         assetFileNames: 'assets/[name]-[hash].[ext]'
       },
     },
-    cssCodeSplit: false,
+    cssCodeSplit: true,
     cssMinify: true,
   },
   server: {

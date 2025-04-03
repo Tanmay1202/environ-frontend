@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-gradient-to-r from-teal-500 to-blue-500 text-white font-medium rounded-md hover:opacity-90 transition-opacity;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-md focus:outline-none focus:border-blue-400;
+  }
+}
