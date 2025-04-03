@@ -118,14 +118,29 @@ const WasteClassifier = () => {
       }
 
       // Convert the image to base64 for the backend
-      const imageBase64 = await new Promise((resolve) => {
+      const imageBase64 = await new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.onloadend = () => {
+          try {
+            const base64Data = reader.result.split(',')[1];
+            if (!base64Data) {
+              reject(new Error('Failed to convert image to base64.'));
+            }
+            resolve(base64Data);
+          } catch (err) {
+            reject(new Error('Failed to process image data.'));
+          }
+        };
+        reader.onerror = () => reject(new Error('Failed to read image file.'));
         reader.readAsDataURL(image);
       });
 
-      // Use relative path for Vercel serverless function
-      const response = await fetch('/api/classify-waste', {
+      // Update the API endpoint to use environment variable
+      if (!import.meta.env.VITE_API_URL) {
+        throw new Error('API URL is not configured. Please check your environment variables.');
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/classify-waste`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
