@@ -9,6 +9,10 @@ export default defineConfig({
     postcss: {
       plugins: [tailwindcss(), autoprefixer()],
     },
+    modules: {
+      localsConvention: 'camelCase',
+      scopeBehaviour: 'local',
+    },
   },
   build: {
     outDir: 'dist',
@@ -33,6 +37,8 @@ export default defineConfig({
         assetFileNames: 'assets/[name]-[hash].[ext]'
       },
     },
+    cssCodeSplit: false,
+    cssMinify: true,
   },
   server: {
     host: '0.0.0.0',
