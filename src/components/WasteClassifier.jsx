@@ -21,7 +21,14 @@ const WasteClassifier = () => {
   useEffect(() => {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     setIsDarkMode(prefersDark);
-  }, []);
+
+    // Cleanup function for image preview
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   // Check if the user is authenticated on component mount
   useEffect(() => {
@@ -66,6 +73,11 @@ const WasteClassifier = () => {
       return;
     }
 
+    // Prevent multiple submissions while loading
+    if (loading) {
+      return;
+    }
+
     setLoading(true);
     setError('');
     setResult(null);
@@ -83,11 +95,26 @@ const WasteClassifier = () => {
               lat: position.coords.latitude,
               lng: position.coords.longitude,
             }),
-            (err) => reject(err)
+            (err) => {
+              switch (err.code) {
+                case err.PERMISSION_DENIED:
+                  reject(new Error('Location access denied. Please enable location services to get nearby recycling centers.'));
+                  break;
+                case err.POSITION_UNAVAILABLE:
+                  reject(new Error('Location information unavailable. Please check your device settings.'));
+                  break;
+                case err.TIMEOUT:
+                  reject(new Error('Location request timed out. Please try again.'));
+                  break;
+                default:
+                  reject(new Error('Failed to get your location. Please try again.'));
+              }
+            },
+            { timeout: 10000, maximumAge: 0, enableHighAccuracy: true }
           );
         });
       } catch (err) {
-        throw new Error('Failed to get your location. Please enable location services.');
+        throw new Error(err.message);
       }
 
       // Convert the image to base64 for the backend
@@ -106,12 +133,13 @@ const WasteClassifier = () => {
         body: JSON.stringify({ imageBase64, userLocation }),
       });
 
+      const responseData = await response.json();
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to classify image');
+        throw new Error(responseData.error || 'Failed to classify image');
       }
 
-      const { labels, wasteType, locations } = await response.json();
+      const { labels, wasteType, locations } = responseData;
       console.log('Backend Response:', { labels, wasteType, locations }); // For debugging
 
       // Map waste type to classification details
