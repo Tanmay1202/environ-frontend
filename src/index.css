@@ -1,14 +1,14 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
   
   body {
-    @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white;
+    @apply min-h-screen bg-gray-50 text-gray-900;
   }
 }
 
@@ -18,6 +18,18 @@
   }
   
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-md focus:outline-none focus:border-blue-400;
+    @apply w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-blue-400;
+  }
+  
+  .card {
+    @apply bg-white rounded-lg shadow-lg p-6;
+  }
+  
+  .heading {
+    @apply text-2xl font-bold text-gray-900;
+  }
+  
+  .subheading {
+    @apply text-lg text-gray-600;
   }
 }
