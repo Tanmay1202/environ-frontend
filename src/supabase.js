@@ -6,33 +6,38 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Check if environment variables are set
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase URL and Anon Key must be provided in environment variables');
+  throw new Error('Missing Supabase environment variables');
 }
 
 // Initialize Supabase client with custom headers and increased timeout
-const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
-  },
-  headers: {
-    'Accept': 'application/json',
+    detectSessionInUrl: true,
+    flowType: 'pkce'
   },
   db: {
-    fetchTimeout: 10000, // Increase timeout to 10 seconds
+    schema: 'public'
   },
+  global: {
+    fetch: fetch.bind(globalThis),
+    headers: {
+      'X-Client-Info': 'environ-frontend'
+    }
+  }
 });
 
-// Retry logic for Supabase queries
-const withRetry = async (fn, retries = 3, delay = 1000) => {
-  for (let i = 0; i < retries; i++) {
+// Retry logic for Supabase queries with exponential backoff
+const withRetry = async (fn, maxRetries = 3) => {
+  for (let i = 0; i < maxRetries; i++) {
     try {
       return await fn();
     } catch (err) {
-      if (i === retries - 1) throw err;
-      console.warn(`Supabase: Retry ${i + 1}/${retries} after error: ${err.message}`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      if (i === maxRetries - 1) throw err;
+      const delay = Math.min(1000 * Math.pow(2, i), 10000); // Exponential backoff with max 10s
+      console.warn(`Supabase: Retry ${i + 1}/${maxRetries} after error: ${err.message}. Waiting ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
 };
@@ -42,20 +47,28 @@ const testSupabaseConnection = async () => {
   try {
     console.log('Supabase: Testing connection...');
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Supabase connection test timed out after 10 seconds')), 10000);
+      setTimeout(() => reject(new Error('Connection test timed out after 10s')), 10000);
     });
 
-    const connectionPromise = withRetry(() => supabase.from('users').select('id').limit(1));
-    const { data, error } = await Promise.race([connectionPromise, timeoutPromise]);
+    const connectionPromise = withRetry(() => 
+      supabase
+        .from('users')
+        .select('id')
+        .limit(1)
+        .single()
+    );
+
+    const { error } = await Promise.race([connectionPromise, timeoutPromise]);
 
     if (error) {
       console.error('Supabase: Connection test failed:', error.message);
-      throw error;
+      return false;
     }
     console.log('Supabase: Connection test successful');
+    return true;
   } catch (err) {
-    console.error('Supabase: Unexpected error during connection test:', err.message);
-    // Don't throw here, just log the error
+    console.error('Supabase: Connection error:', err.message);
+    return false;
   }
 };
 
