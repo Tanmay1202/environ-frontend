@@ -1,39 +1,41 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   css: {
-    postcss: './postcss.config.cjs',
+    postcss: true,
+    modules: {
+      localsConvention: 'camelCase',
+    },
   },
   build: {
     outDir: 'dist',
+    assetsDir: 'assets',
     sourcemap: false,
     minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    },
+    cssCodeSplit: false,
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          supabase: ['@supabase/supabase-js'],
           ui: ['framer-motion', 'react-icons', 'react-hot-toast'],
         },
       },
     },
-    cssCodeSplit: false,
   },
   define: {
     'process.env.NODE_ENV': '"production"',
   },
   server: {
-    host: '0.0.0.0',
     port: 5173,
-    hmr: true,
+    strictPort: true,
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom', '@supabase/supabase-js', 'framer-motion', 'react-icons', 'react-hot-toast'],
